@@ -1,6 +1,7 @@
 import typing as t
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.crud.serializers import create_pydantic_model
@@ -17,13 +18,24 @@ from endpoints.solicitud_endpoint import ActualizarSolicitud, CrearSolicitud, El
 
 
 app = FastAPI()
+origins = ['http://localhost:8000']
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # TaskModelIn: t.Any = create_pydantic_model(table=Task, model_name="TaskModelIn")
 # TaskModelOut: t.Any = create_pydantic_model(
 #     table=Task, include_default_columns=True, model_name="TaskModelOut"
 # )
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
 # POST /solicitud: Envía solicitud de ingreso.
 @app.post("/solicitud")
@@ -56,8 +68,7 @@ async def get_asignaciones():
 
 @app.get("/estatus")
 async def get_estatus():
-    print("reached")
-    #return await ObtenerTodosEstados()
+    return await ObtenerTodosEstados()
 
 
 # DELETE /solicitud/{id}: Elimina solicitud de ingreso. 
