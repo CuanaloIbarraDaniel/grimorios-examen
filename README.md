@@ -70,12 +70,14 @@ piccolo migrations forwards database_data
 ## Correr APP
 
 ## A.- Ejecutar la aplicación
+Esto se realiza dentro de la carpeta "grimorios"
 
 ```bash
 python main.py
 ```
 
 ## B.- Ejecutar las pruebas
+Esto se realiza dentro de la carpeta "grimorios"
 
 ```bash
 piccolo tester run
