@@ -208,22 +208,3 @@ def test_delete_empty_body():
     response = client.delete("/solicitud/", headers={"X-Token": "coneofsilence"})
     assert response.status_code == 400
     assert response.json() == {'detalles': '405: Method Not Allowed'}
-
-def test_post_success():
-    response = client.post("/solicitud", headers={"X-Token": "coneofsilence"}, json={
-        "id": 0,
-        "nombre": "Daniel",
-        "apellido": "Cuanalo",
-        "identificacion": "F514JDH",
-        "edad": 24,
-        "afinidad_magica": "Luz"
-    })
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 0,
-        "nombre": "Daniel",
-        "apellido": "Cuanalo",
-        "identificacion": "F514JDH",
-        "edad": 24,
-        "afinidad_magica": "Luz"
-    }

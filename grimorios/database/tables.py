@@ -4,7 +4,7 @@ from piccolo.table import Table
 
 
 
-class SolicitudTable(Table, if_not_exists=True):
+class SolicitudTable(Table):
     id = UUID(),
     nombre = Varchar(length=20)
     apellido = Varchar(length=20)
@@ -14,20 +14,20 @@ class SolicitudTable(Table, if_not_exists=True):
 
 
 
-class GrimorioTable(Table, if_not_exists=True):
+class GrimorioTable(Table):
     id = UUID(),
     nombre = Varchar(length=20)
     rareza = Integer()
 
 
 
-class EstatusTable(Table, if_not_exists=True):
+class EstatusTable(Table):
     id = UUID(),
     estatus = Varchar(length=200)
 
 
 
-class AsignacionTable(Table, if_not_exists=True):
+class AsignacionTable(Table):
     id = UUID(),
     solicitud_id = ForeignKey(references=SolicitudTable, target_column=SolicitudTable.id)
     estatus_id = ForeignKey(references=EstatusTable, target_column=EstatusTable.id)
