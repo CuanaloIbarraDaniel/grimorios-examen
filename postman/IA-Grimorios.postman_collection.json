@@ -1,0 +1,193 @@
+{
+	"info": {
+		"_postman_id": "96840302-86c6-4006-985e-b1ab725cc936",
+		"name": "IA-Grimorios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20377712",
+		"_collection_link": "https://ia-interactive.postman.co/workspace/API-MX-2021~8817b208-596d-40c5-958f-d4080da1c51a/collection/20377712-96840302-86c6-4006-985e-b1ab725cc936?action=share&source=collection_link&creator=20377712"
+	},
+	"item": [
+		{
+			"name": "POST Crear Solicitud",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 0,\r\n    \"nombre\": \"Daniel\",\r\n    \"apellido\": \"Cuanalo\",\r\n    \"identificacion\": \"F514JDH\",\r\n    \"edad\": 24,\r\n    \"afinidad_magica\": \"Luz\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8470/solicitud",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"solicitud"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Actualizar Solicitud",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 0,\r\n    \"nombre\": \"Marco\",\r\n    \"apellido\": \"Quesada\",\r\n    \"identificacion\": \"F81JF781H\",\r\n    \"edad\": 27,\r\n    \"afinidad_magica\": \"Oscuridad\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8470/solicitud/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"solicitud",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Actualizar Estatus",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8470/solicitud/1/estatus?SolicitudEstatus=3",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"solicitud",
+						"1",
+						"estatus"
+					],
+					"query": [
+						{
+							"key": "SolicitudEstatus",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Obtener Solicitudes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8470/solicitudes",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"solicitudes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Obtener Asignaciones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8470/asignaciones",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"asignaciones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Eliminar Solicitud",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8470/solicitud/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"solicitud",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Obtener Estatus",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8470/estatus",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8470",
+					"path": [
+						"estatus"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

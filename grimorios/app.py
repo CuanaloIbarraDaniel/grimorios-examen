@@ -1,9 +1,10 @@
 import typing as t
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Query, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import FastAPIError, RequestValidationError, ValidationException
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.crud.serializers import create_pydantic_model
@@ -19,80 +20,117 @@ from endpoints.asignacionendpoint import ObtenerTodasAsignaciones
 from endpoints.estatusendpoint import ObtenerTodosEstados
 from endpoints.solicitudendpoint import ActualizarSolicitud, CrearSolicitud, EliminarSolicitudes, ObtenerTodasSolicitudes, ParchearSolicitud
 
-
-app = FastAPI()
-origins = ['http://localhost:8000']
-
+# Los nombres y las descripciones para los tags
+tags_metadata = [
+    {
+        "name": "Default",
+        "description": "Operaciones creadas por default.",
+    },
+    {
+        "name": "Solicitudes",
+        "description": "Todas las operaciones relacionadas a las solicitudes de Grimorios.",
+    },
+    {
+        "name": "Asignaciones",
+        "description": "Operaciones relacionadas a las asignaciones que se relacionan a las tablas de Estatus y Grimorios.",
+    },
+    {
+        "name": "Estatus",
+        "description": "Maneja los Estatus de los Grimorios y Solicitudes.",
+    },
+]
+# Inicializa el objeto de FastAPI
+app = FastAPI(openapi_tags=tags_metadata)
+# Middleware para garantizar que las llamadas lleguen al servicio
+origins = ['http://localhost:8470']
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# TaskModelIn: t.Any = create_pydantic_model(table=Task, model_name="TaskModelIn")
-# TaskModelOut: t.Any = create_pydantic_model(
-#     table=Task, include_default_columns=True, model_name="TaskModelOut"
-# )
 
-@app.get("/")
+# LLamada por default
+@app.get("/", tags=["Default"])
 def read_root():
-    return {"Hello": "World"}
+    """
+    Esta es la llamada por default del servidor y sirve para detectar si se puede alcanzar el mismo desde el exterior.
+    """
+    return {"Dev Screen"}
 
 
 
 # POST /solicitud: Envía solicitud de ingreso.
-@app.post("/solicitud")
-async def get_solicitudes(_SolicitudViewModel: SolicitudViewModel):    
+@app.post("/solicitud", status_code=status.HTTP_200_OK, tags=["Solicitudes"])
+async def get_solicitudes(_SolicitudViewModel: SolicitudViewModel):
+    """
+    Esta llamada se utiliza para poder crear solicitudes y asignaciones con una sola llamada.
+    """
     return await CrearSolicitud(_SolicitudViewModel)
 
 
 
 # PUT /solicitud/{id}: Actualiza solicitud de ingreso.
-@app.put("/solicitud/{_SolicitudId}")
+@app.put("/solicitud/{_SolicitudId}", status_code=status.HTTP_200_OK, tags=["Solicitudes"])
 async def put_solicitudes(_SolicitudId: int, _SolicitudViewModel: SolicitudViewModel):
+    """
+    Esta llamada sirve para actualizar una solicitud usando una ID
+    """
     return await ActualizarSolicitud(_SolicitudId, _SolicitudViewModel)
 
 
 
 # PATCH /solicitud/{id}/estatus: Actualiza estatus de solicitud.
-@app.patch("/solicitud/{_SolicitudId}/estatus")
+@app.patch("/solicitud/{_SolicitudId}/estatus", status_code=status.HTTP_200_OK, tags=["Solicitudes"])
 async def patch_solicitudes(_SolicitudId: int, SolicitudEstatus: int):
+    """
+    Utilizado para actualizar el estatus de la solicitud (Se puede elegir entre Pendiente = 1, Aceptada = 2 y Rechazada = 3).
+    """
     return await ParchearSolicitud(_SolicitudId, SolicitudEstatus)
 
 
 
 # GET /solicitudes: Consulta todas las solicitudes.
-@app.get("/solicitudes")
+@app.get("/solicitudes", status_code=status.HTTP_200_OK, tags=["Solicitudes"])
 async def get_solicitudes():
+    """    
+    Esta llamada se utiliza para obtener todas las solicitudes que se encuentran en la base de datos
+    """
     return await ObtenerTodasSolicitudes()
 
 
 
-# GET /asignaciones: Consulta asignaciones de Grimorios.
-@app.get("/asignaciones")
-async def get_asignaciones():
-    return await ObtenerTodasAsignaciones()
-
-
-
-@app.get("/estatus")
-async def get_estatus():
-    return await ObtenerTodosEstados()
-
-
-
 # DELETE /solicitud/{id}: Elimina solicitud de ingreso. 
-@app.delete("/solicitud/{_SolicitudId}")
+@app.delete("/solicitud/{_SolicitudId}", status_code=status.HTTP_200_OK, tags=["Solicitudes"])
 async def get_solicitudes(_SolicitudId: int):
+    """
+    Elimina una solicitud y su asignación correspondiente utilizando su ID
+    """
     return await EliminarSolicitudes(_SolicitudId)
 
 
 
-# @app.exception_handler(ValueError)
-# async def value_error_exception_handler(request: Request, exc: ValueError):
-#     return JSONResponse(status_code=exc.status_code, content={{"mensaje": str(exc)})
+# GET /asignaciones: Consulta asignaciones de Grimorios.
+@app.get("/asignaciones", status_code=status.HTTP_200_OK, tags=["Asignaciones"])
+async def get_asignaciones():
+    """
+    Obtiene todas las asignaciones que se encuentran en la base de datos
+    """
+    return await ObtenerTodasAsignaciones()
+
+
+
+@app.get("/estatus", status_code=status.HTTP_200_OK, tags=["Estatus"])
+async def get_estatus():
+    """
+    OBtiene todos los estatus que se encuentran en la base de datos
+    """
+    return await ObtenerTodosEstados()
+
+
+
 
 @app.exception_handler(StarletteHTTPException)
 async def starlette_http_exception(request, exc):
@@ -118,56 +156,21 @@ async def type_error(request, exc):
 
 
 
-# @app.get("/tasks/", response_model=t.List[TaskModelOut])
-# async def tasks():
-#     return await Task.select().order_by(Task.id)
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Swagger para Grimorios",
+        version="1.1.0",
+        summary="Este es un schema de OpenAPI",
+        description="Schema para representar todas las operaciones posibles dentro de la API de Grimorios con la ayuda de OpenAPI",
+        routes=app.routes,
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
 
 
-# @app.post("/tasks/", response_model=TaskModelOut)
-# async def create_task(task_model: TaskModelIn):
-#     task = Task(**task_model.dict())
-#     await task.save()
-#     return task.to_dict()
-
-
-# @app.put("/tasks/{task_id}/", response_model=TaskModelOut)
-# async def update_task(task_id: int, task_model: TaskModelIn):
-#     task = await Task.objects().get(Task.id == task_id)
-#     if not task:
-#         return JSONResponse({}, status_code=404)
-
-#     for key, value in task_model.dict().items():
-#         setattr(task, key, value)
-
-#     await task.save()
-
-#     return task.to_dict()
-
-
-# @app.delete("/tasks/{task_id}/")
-# async def delete_task(task_id: int):
-#     task = await Task.objects().get(Task.id == task_id)
-#     if not task:
-#         return JSONResponse({}, status_code=404)
-
-#     await task.remove()
-
-#     return JSONResponse({})
-
-
-# @app.on_event("startup")
-# async def open_database_connection_pool():
-#     try:
-#         engine = engine_finder()
-#         await engine.start_connection_pool()
-#     except Exception:
-#         print("Unable to connect to the database")
-
-
-# @app.on_event("shutdown")
-# async def close_database_connection_pool():
-#     try:
-#         engine = engine_finder()
-#         await engine.close_connection_pool()
-#     except Exception:
-#         print("Unable to connect to the database")
+app.openapi = custom_openapi

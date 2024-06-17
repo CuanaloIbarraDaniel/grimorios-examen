@@ -97,7 +97,6 @@ async def ParchearSolicitud(_SolicitudId: int, _estatus: int):
         AsignacionTable.estatus_id: _estatus
     }).where(AsignacionTable.solicitud_id == _SolicitudId).returning(SolicitudTable.id)
 
-    print(_SolicitudModelId)
     _SolicitudModelId = _SolicitudModelId[0]["id"]
     return await ObtenerByIdSolicitudes(_SolicitudModelId)
 
