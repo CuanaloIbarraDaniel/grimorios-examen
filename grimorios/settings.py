@@ -10,7 +10,7 @@ class LogLevel(str, enum.Enum):  # noqa: WPS600
 
 class Settings():
     Host: str = "127.0.0.1"
-    Port: int = 8000
+    Port: int = 8470
     # quantity of workers for uvicorn
     WorkersCount: int = 1
     # Enable uvicorn reloading
@@ -21,8 +21,9 @@ class Settings():
     # Variables for the database
     DatabaseHost: str = "localhost"
     DatabasePort: int = 5432
-    DatabaseUsername: str = "postgres"
-    DatabasePassword: str = "f9sjav6k5k"
-    DatabaseName: str = "grimorios"
+    DatabaseUsername: str = ""
+    DatabasePassword: str = ""
+    DatabaseName: str = ""
+    DatabaseNameTest: str = ""
 
 _AppSetting = Settings()
