@@ -1,5 +1,5 @@
 import json
-from Models.AsignacionModel import AsignacionModel
+from models.asignacionmodel import AsignacionModel
 from database.tables import (SolicitudTable, AsignacionTable)
 
 

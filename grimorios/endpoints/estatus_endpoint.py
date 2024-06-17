@@ -1,6 +1,6 @@
 import json
 from database.tables import (EstatusTable)
-from Models.EstatusModel import EstatusModel
+from models.estatusmodel import EstatusModel
 
 
 # Obtener todos los estados

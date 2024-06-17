@@ -8,19 +8,15 @@ from piccolo.engine import engine_finder
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 
-from Models.AsignacionModel import AsignacionModel
-from Models.EstatusModel import EstatusModel
-from Models.SolicitudModel import SolicitudModel
+from models.asignacionmodel import AsignacionModel
+from models.estatusmodel import EstatusModel
+from models.solicitudmodel import SolicitudModel
 from endpoints.asignacion_endpoint import ObtenerTodasAsignaciones
 from endpoints.estatus_endpoint import ObtenerTodosEstados
 from endpoints.solicitud_endpoint import ActualizarSolicitud, CrearSolicitud, EliminarSolicitudes, ObtenerTodasSolicitudes, ParchearSolicitud
 
 
-app = FastAPI(
-    routes=[
-        Mount("/static/", StaticFiles(directory="static")),
-    ],
-)
+app = FastAPI()
 
 
 # TaskModelIn: t.Any = create_pydantic_model(table=Task, model_name="TaskModelIn")
@@ -30,37 +26,38 @@ app = FastAPI(
 
 
 # POST /solicitud: Envía solicitud de ingreso.
-@app.post("/solicitud", response_model=SolicitudModel)
+@app.post("/solicitud")
 async def get_solicitudes(_SolicitudModel: SolicitudModel):
     return await CrearSolicitud(_SolicitudModel)
 
 
 # PUT /solicitud/{id}: Actualiza solicitud de ingreso.
-@app.put("/solicitudes/{_SolicitudId}", response_model=SolicitudModel)
+@app.put("/solicitudes/{_SolicitudId}")
 async def put_solicitudes(_SolicitudId, _SolicitudModel: SolicitudModel):
     return await ActualizarSolicitud(_SolicitudId, _SolicitudModel)
 
 
 # PATCH /solicitud/{id}/estatus: Actualiza estatus de solicitud.
-@app.patch("/solicitudes/{_SolicitudId}/estatus", response_model=SolicitudModel)
+@app.patch("/solicitudes/{_SolicitudId}/estatus")
 async def patch_solicitudes(_SolicitudId: int, _estatus: int):
     return await ParchearSolicitud(_SolicitudId, _estatus)
 
 
 # GET /solicitudes: Consulta todas las solicitudes.
-@app.get("/solicitudes", response_model=t.List[SolicitudModel])
+@app.get("/solicitudes")
 async def get_solicitudes():
     return await ObtenerTodasSolicitudes()
 
 
 # GET /asignaciones: Consulta asignaciones de Grimorios.
-@app.get("/asignaciones", response_model=t.List[AsignacionModel])
+@app.get("/asignaciones")
 async def get_asignaciones():
     return await ObtenerTodasAsignaciones()
 
-@app.get("/estatus", response_model=t.List[EstatusModel])
+@app.get("/estatus")
 async def get_estatus():
-    return await ObtenerTodosEstados()
+    print("reached")
+    #return await ObtenerTodosEstados()
 
 
 # DELETE /solicitud/{id}: Elimina solicitud de ingreso. 
