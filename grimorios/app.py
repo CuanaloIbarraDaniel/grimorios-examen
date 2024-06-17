@@ -1,20 +1,23 @@
 import typing as t
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import FastAPIError, RequestValidationError, ValidationException
 from fastapi.responses import JSONResponse
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.crud.serializers import create_pydantic_model
 from piccolo.engine import engine_finder
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
-
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from models.solicitudviewmodel import SolicitudViewModel
 from models.asignacionmodel import AsignacionModel
 from models.estatusmodel import EstatusModel
 from models.solicitudmodel import SolicitudModel
-from endpoints.asignacion_endpoint import ObtenerTodasAsignaciones
-from endpoints.estatus_endpoint import ObtenerTodosEstados
-from endpoints.solicitud_endpoint import ActualizarSolicitud, CrearSolicitud, EliminarSolicitudes, ObtenerTodasSolicitudes, ParchearSolicitud
+from endpoints.asignacionendpoint import ObtenerTodasAsignaciones
+from endpoints.estatusendpoint import ObtenerTodosEstados
+from endpoints.solicitudendpoint import ActualizarSolicitud, CrearSolicitud, EliminarSolicitudes, ObtenerTodasSolicitudes, ParchearSolicitud
 
 
 app = FastAPI()
@@ -37,22 +40,27 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
+
+
 # POST /solicitud: Envía solicitud de ingreso.
 @app.post("/solicitud")
-async def get_solicitudes(_SolicitudModel: SolicitudModel):
-    return await CrearSolicitud(_SolicitudModel)
+async def get_solicitudes(_SolicitudViewModel: SolicitudViewModel):    
+    return await CrearSolicitud(_SolicitudViewModel)
+
 
 
 # PUT /solicitud/{id}: Actualiza solicitud de ingreso.
-@app.put("/solicitudes/{_SolicitudId}")
-async def put_solicitudes(_SolicitudId, _SolicitudModel: SolicitudModel):
-    return await ActualizarSolicitud(_SolicitudId, _SolicitudModel)
+@app.put("/solicitud/{_SolicitudId}")
+async def put_solicitudes(_SolicitudId: int, _SolicitudViewModel: SolicitudViewModel):
+    return await ActualizarSolicitud(_SolicitudId, _SolicitudViewModel)
+
 
 
 # PATCH /solicitud/{id}/estatus: Actualiza estatus de solicitud.
-@app.patch("/solicitudes/{_SolicitudId}/estatus")
-async def patch_solicitudes(_SolicitudId: int, _estatus: int):
-    return await ParchearSolicitud(_SolicitudId, _estatus)
+@app.patch("/solicitud/{_SolicitudId}/estatus")
+async def patch_solicitudes(_SolicitudId: int, SolicitudEstatus: int):
+    return await ParchearSolicitud(_SolicitudId, SolicitudEstatus)
+
 
 
 # GET /solicitudes: Consulta todas las solicitudes.
@@ -61,22 +69,52 @@ async def get_solicitudes():
     return await ObtenerTodasSolicitudes()
 
 
+
 # GET /asignaciones: Consulta asignaciones de Grimorios.
 @app.get("/asignaciones")
 async def get_asignaciones():
     return await ObtenerTodasAsignaciones()
+
+
 
 @app.get("/estatus")
 async def get_estatus():
     return await ObtenerTodosEstados()
 
 
+
 # DELETE /solicitud/{id}: Elimina solicitud de ingreso. 
-@app.delete("/solicitudes/{id}")
-async def get_solicitudes(id: int):
-    return await EliminarSolicitudes()
+@app.delete("/solicitud/{_SolicitudId}")
+async def get_solicitudes(_SolicitudId: int):
+    return await EliminarSolicitudes(_SolicitudId)
 
 
+
+# @app.exception_handler(ValueError)
+# async def value_error_exception_handler(request: Request, exc: ValueError):
+#     return JSONResponse(status_code=exc.status_code, content={{"mensaje": str(exc)})
+
+@app.exception_handler(StarletteHTTPException)
+async def starlette_http_exception(request, exc):
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detalles": str(exc)})
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error(request, exc):
+    for error in exc.errors(): 
+        error['message'] = error.pop('msg')
+    return JSONResponse(content=jsonable_encoder({"detalles": exc.errors()}), status_code=status.HTTP_400_BAD_REQUEST)
+
+@app.exception_handler(ValidationException)
+async def validation_exception(request, exc):
+    return JSONResponse(status_code=exc.status.HTTP_400_BAD_REQUEST, content={"detalles": str(exc)})
+
+@app.exception_handler(FastAPIError)
+async def fast_api_error(request, exc):
+    return JSONResponse(status_code=exc.status.HTTP_400_BAD_REQUEST, content={"detalles": str(exc)})
+
+@app.exception_handler(TypeError)
+async def type_error(request, exc):
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detalles": str(exc)})
 
 
 

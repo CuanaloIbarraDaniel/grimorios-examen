@@ -7,3 +7,6 @@ class GrimorioModel():
         self.id = id
         self.nombre = nombre
         self.rareza = rareza
+
+    def __repr__(self):
+        return f'{str(self.id)}, {str(self.nombre)}, {str(self.rareza)}'
