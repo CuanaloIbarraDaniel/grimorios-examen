@@ -13,7 +13,6 @@
 - Base de Datos: [PostgreSQL](https://www.postgresql.org/)
 - Pruebas: [PyTest](https://docs.pytest.org/en/8.2.x/)
 - Documentación: [Swagger](https://swagger.io/)
-- Contenedor: [Docker](https://www.docker.com/)
 
 ## Setup
 
@@ -70,14 +69,22 @@ piccolo migrations forwards database_data
 ```
 ## Correr APP
 
-## A) Ejecutar la aplicación
+## A.- Ejecutar la aplicación
 
 ```bash
 python main.py
 ```
 
-## B) Ejecutar las pruebas
+## B.- Ejecutar las pruebas
 
 ```bash
 piccolo tester run
 ```
+
+## Documentación
+
+## A.- Postman
+En el folder principal del proyecto puedes encontrar una colección de Postman en la carpeta nombrada "postman"
+
+## B.- Swagger
+All ejecutar la aplicación podrás acceder a los Docs de Swagger agregando la palabra "docs" al final del enlace generado por la aplicación
